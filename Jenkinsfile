@@ -1,43 +1,71 @@
-pipeline {
-    agent any
-
-    environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+pipeline { 
+2
+    environment { 
+3
+        registry = "YourDockerhubAccount/YourRepository" 
+4
+        registryCredential = 'dockerhub_id' 
+5
+        dockerImage = '' 
+6
     }
-
-    stages {
-        stage('Checkout') {
-            steps {
-                // Checkout code from GitHub
-                checkout scm
+7
+    agent any 
+8
+    stages { 
+9
+        stage('Cloning our Git') { 
+10
+            steps { 
+11
+                git 'https://github.com/YourGithubAccount/YourGithubRepository.git' 
+12
             }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    // Build Docker image from Dockerfile
-                    dockerImage = docker.build("${DOCKERHUB_CREDENTIALS_USR}/library:latest")
+13
+        } 
+14
+        stage('Building our image') { 
+15
+            steps { 
+16
+                script { 
+17
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+18
                 }
-            }
+19
+            } 
+20
         }
-
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    // Push Docker image to Docker Hub
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        dockerImage.push()
+21
+        stage('Deploy our image') { 
+22
+            steps { 
+23
+                script { 
+24
+                    docker.withRegistry( '', registryCredential ) { 
+25
+                        dockerImage.push() 
+26
                     }
-                }
+27
+                } 
+28
             }
-        }
+29
+        } 
+30
+        stage('Cleaning up') { 
+31
+            steps { 
+32
+                sh "docker rmi $registry:$BUILD_NUMBER" 
+33
+            }
+34
+        } 
+35
     }
-
-    post {
-        always {
-            // Clean up workspace
-            cleanWs()
-        }
-    }
+36
 }
