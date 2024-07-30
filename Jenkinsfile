@@ -1,40 +1,46 @@
 pipeline {
+    agent any
 
-    environment { 
-        registry = "YourDockerhubAccount/YourRepository" 
-        registryCredential = 'dockerhub_id' 
-        dockerImage = '' 
+    environment {
+        registry = "maria0803/library"
+        registryCredential = 'dockerhub_id'
+        dockerImage = ''
     }
-    agent any 
-    
+
     stages {
-        
-        stage('Cloning our Git') {
+        stage('Checkout') {
             steps {
                 git 'https://github.com/MariaAbdallah1/Library.git'
             }
         }
-        stage('Building our image') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                    dockerImage = docker.build("${registry}:${env.BUILD_NUMBER}")
                 }
             }
         }
-        stage('Deploy our image') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry( '', registryCredential ) {
+                    docker.withRegistry('', registryCredential) {
                         dockerImage.push()
+                        dockerImage.push('latest')
                     }
                 }
             }
         }
-        stage('Cleaning up') {
+        stage('Cleanup') {
             steps {
-                sh "docker rmi $registry:$BUILD_NUMBER" 
+                sh "docker rmi ${registry}:${env.BUILD_NUMBER}"
+                sh "docker rmi ${registry}:latest"
             }
         }
+    }
 
+    post {
+        always {
+            cleanWs()
+        }
     }
 }
