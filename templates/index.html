@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            background-color: #f1f1f1;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px; /* Horizontal and vertical margin */
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .button.back-button {
+            background-color: #f0f0f0; /* Gray */
+            color: black;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search-container input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .main-content {
+            margin-top: 20px;
+        }
+        .book-list {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">Library Management System</div>
+        <div class="search-container">
+            <form method="GET" action="{{ url_for('search_books') }}">
+                <input type="text" name="search" placeholder="Search for books..." />
+                <button type="submit" class="button">Search</button>
+            </form>
+        </div>
+        <div class="button-container">
+            <a href="{{ url_for('add_book') }}" class="button">Add Book</a>
+            <a href="{{ url_for('remove_book_route') }}" class="button">Remove Book</a>
+            <a href="{{ url_for('borrow_book_route') }}" class="button">Borrow Book</a>
+            <a href="{{ url_for('return_book_route') }}" class="button">Return Book</a>
+        </div>
+    </div>
+    <div class="main-content">
+        <h1>Available Books</h1>
+        <div class="book-list">
+            <ul>
+                {% for book in books %}
+                <li>{{ book.title }} by {{ book.author }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
