@@ -3,21 +3,15 @@ pipeline {
 
     environment {
         registry = "maria0803/library"
-        registryCredential = ''
+        registryCredential = 'veles3'
         dockerImage = ''
     }
 
     stages {
-        // stage('Checkout') {
-        //     steps {
-        //         git 'https://github.com/MariaAbdallah1/Library.git'
-        //     }
-        // }
         stage('Build Docker Image') {
             steps {
                 script {
-                    // dockerImage = docker.build("${registry}:${env.BUILD_NUMBER}")
-                    sh 'docker build -t libraryapp .'
+                    dockerImage = docker.build("${registry}:${env.BUILD_NUMBER}")
                 }
             }
         }
@@ -33,8 +27,10 @@ pipeline {
         }
         stage('Cleanup') {
             steps {
-                sh "docker rmi ${registry}:${env.BUILD_NUMBER}"
-                sh "docker rmi ${registry}:latest"
+                script {
+                    sh "docker rmi ${registry}:${env.BUILD_NUMBER}"
+                    sh "docker rmi ${registry}:latest"
+                }
             }
         }
     }
