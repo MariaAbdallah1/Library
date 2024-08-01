@@ -8,11 +8,11 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/MariaAbdallah1/Library.git'
-            }
-        }
+        // stage('Checkout') {
+        //     steps {
+        //         git 'https://github.com/MariaAbdallah1/Library.git'
+        //     }
+        // }
         stage('Build Docker Image') {
             steps {
                 script {
