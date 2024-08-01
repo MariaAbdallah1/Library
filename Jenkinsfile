@@ -16,8 +16,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${registry}:${env.BUILD_NUMBER}")
-                    // sh 'docker build -t libraryapp .'
+                    // dockerImage = docker.build("${registry}:${env.BUILD_NUMBER}")
+                    sh 'docker build -t libraryapp .'
                 }
             }
         }
