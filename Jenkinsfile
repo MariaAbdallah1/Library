@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         registry = "maria0803/library"
-        registryCredential = 'dockerhub_id'
+        registryCredential = ''
         dockerImage = ''
     }
 
