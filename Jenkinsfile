@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        registry = "maria0803/library"
+        registry = "veles3/library"
         registryCredential = 'docker-c'
         dockerImage = ''
     }
