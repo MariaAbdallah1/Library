@@ -11,16 +11,19 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("${registry}:${env.BUILD_NUMBER}")
+                    dockerImage = "${registry}:${env.BUILD_NUMBER}"
+                    sh "docker build -t ${dockerImage} ."
                 }
             }
         }
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('', registryCredential) {
-                        dockerImage.push()
-                        dockerImage.push('latest')
+                    withCredentials([usernamePassword(credentialsId: registryCredential, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                        sh "docker push ${dockerImage}"
+                        sh "docker tag ${dockerImage} ${registry}:latest"
+                        sh "docker push ${registry}:latest"
                     }
                 }
             }
@@ -28,7 +31,7 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    sh "docker rmi ${registry}:${env.BUILD_NUMBER}"
+                    sh "docker rmi ${dockerImage}"
                     sh "docker rmi ${registry}:latest"
                 }
             }
