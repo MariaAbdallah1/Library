@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         registry = "veles3/library"
-        registryCredential = 'docker-c'
+        registryCredential = 'dockerhub'
         dockerImage = ''
     }
 
