@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name: flask-app
-          image: maria0803/library:latest
+          image: sarahassan11/comingsoon-page:latest
           ports:
             - containerPort: 5000
           volumeMounts:
