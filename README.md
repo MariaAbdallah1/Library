@@ -49,6 +49,13 @@ resource "aws_eks_node_group" "eks_nodes" {
     min_size     = 1
   }
 ```
+Apply terraform configuration
+```sh
+terraform init
+terraform plan
+terraform apply --auto-aprove
+```
+```sh
 ## app.yaml
 ```yaml
 apiVersion: v1
@@ -63,4 +70,7 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 5000
+```
+```sh
+kubectl apply -f app.yaml
 ```
