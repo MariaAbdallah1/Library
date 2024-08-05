@@ -75,57 +75,74 @@ kubectl apply -f app.yaml
 ```
 ## CI/CD pipeline
 ### Prerequisites
-..* Jenkins installed and configured.
-..* AWS CLI installed and configured.
-..* Docker installed.
-..* Terraform installed.
-..* AWS access key and secret access key.
-..* Docker Hub credentials.
-..* Kubernetes cluster and kubeconfig file.
+- Jenkins installed and configured.
+- AWS CLI installed and configured.
+- Docker installed.
+- Terraform installed.
+- AWS access key and secret access key.
+- Docker Hub credentials.
+- Kubernetes cluster and kubeconfig file.
 Stages Overview
 1. Checkout SCM
   - Purpose: Check out the source code from the specified Git repository.
   - Steps:
       ```git
-         git branch: 'main', url: 'https://github.com/MariaAbdallah1/Library.git'
+      git branch: 'main', url: 'https://github.com/MariaAbdallah1/Library.git'
       ```
 2. Docker Build and Push
-...Purpose: Build the Docker image and push it to Docker Hub.
-...Steps:
-   
+  - Purpose: Build the Docker image and push it to Docker Hub.
+  - Steps:
   ```script
    script {
-                    withDockerRegistry(credentialsId: 'dockerhub') {
-                        bat 'docker build -t sarahassan11/myflask:latest .'
-                        bat 'docker push sarahassan11/myflask:latest'
-                    }
+        withDockerRegistry(credentialsId: 'dockerhub') {
+        bat 'docker build -t sarahassan11/myflask:latest .'
+        bat 'docker push sarahassan11/myflask:latest'
+        }
+  }
 ```
 4. Initialize Terraform
-...Purpose: Initialize the Terraform configuration.
-Steps:
-Run terraform init to initialize the Terraform configuration.
+  - Purpose: Initialize the Terraform configuration.
+  - Steps:
+    ```script
+    bat 'terraform init'
+    ```
 5. Validate Terraform
-...Purpose: Validate the Terraform configuration.
-Steps:
-Run terraform validate to ensure the configuration is correct.
+  - Purpose: Validate the Terraform configuration.
+  - Steps:
+    ```script
+    bat 'terraform validate'
+    ```
 6. Terraform Plan
-...Purpose: Create an execution plan for Terraform.
-Steps:
-Run terraform plan -out=tfplan to create a plan and save it to tfplan.
+  - Purpose: Create an execution plan for Terraform.
+  - Steps:
+    ```script
+    bat 'terraform plan -out=tfplan'
+    ```
 7. Approval
-...Purpose: Wait for manual approval before applying the Terraform plan.
-Steps:
-Prompt for manual approval to proceed with the Terraform apply.
+  - Purpose: Wait for manual approval before applying the Terraform plan.
+  - Steps:
+    ```script
+    input message: "Approve the Terraform plan?", ok: "Apply"
+    ```
 8. Apply Terraform
-...Purpose: Apply the Terraform plan to provision the infrastructure.
-Steps:
-Run terraform apply tfplan to apply the saved plan.
+  - Purpose: Apply the Terraform plan to provision the infrastructure.
+  - Steps:
+    ```script
+    bat 'terraform apply tfplan'
+    ```
 9. Update Kubeconfig
-...Purpose: Update the kubeconfig file to connect to the EKS cluster.
-Steps:
-Run aws eks --region eu-north-1 update-kubeconfig --name my-cluster to update the kubeconfig file.
+  - Purpose: Update the kubeconfig file to connect to the EKS cluster.
+  - Steps:
+    ```script
+    // Ensure AWS CLI is installed and configured
+    bat 'aws --version'
+                
+    // Update kubeconfig for EKS
+    bat 'aws eks --region eu-north-1 update-kubeconfig --name my-cluster'
+    ```
 10. Deploy to Kubernetes
-...Purpose: Deploy the application to the Kubernetes cluster.
-Steps:
-Use the Kubernetes plugin to deploy the application using the app.yaml configuration file.
-
+  - Purpose: Deploy the application to the Kubernetes cluster.
+  - Steps:
+    ```script
+    kubernetesDeploy(configs: "app.yaml", kubeconfigId: "kubernetes")
+    ```
