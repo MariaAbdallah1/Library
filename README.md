@@ -48,3 +48,18 @@ resource "aws_eks_node_group" "eks_nodes" {
     min_size     = 1
   }
 ```
+## app.yaml
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: new-flask-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: flask-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+```
