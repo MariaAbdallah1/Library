@@ -84,15 +84,15 @@ kubectl apply -f app.yaml
 ..* Kubernetes cluster and kubeconfig file.
 Stages Overview
 1. Checkout SCM
-...Purpose: Check out the source code from the specified Git repository.
-Steps:
-Clone the repository from the main branch.
+  - Purpose: Check out the source code from the specified Git repository.
+  - Steps:
+      ```git
+         git branch: 'main', url: 'https://github.com/MariaAbdallah1/Library.git'
+      ```
 2. Docker Build and Push
 ...Purpose: Build the Docker image and push it to Docker Hub.
 ...Steps:
-   ```git
-   git branch: 'main', url: 'https://github.com/MariaAbdallah1/Library.git'
-   ```
+   
   ```script
    script {
                     withDockerRegistry(credentialsId: 'dockerhub') {
