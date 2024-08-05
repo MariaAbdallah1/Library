@@ -23,12 +23,7 @@ pipeline {
                     }
                 }
             }
-        } 
-        
-        
-        
-        
-        
+        }        
         
          stage('Initializing Terraform'){
             steps{
@@ -49,12 +44,10 @@ pipeline {
             steps{
                 
                 bat 'terraform plan -out=tfplan'
-               
                 
             }
              
          }
-         
          
           stage('Approval') {
             steps {
@@ -68,7 +61,6 @@ pipeline {
             }
         }
         
-        
         stage('Update Kubeconfig') {
             steps {
                 script {
@@ -81,9 +73,6 @@ pipeline {
             }
         }
         
-        
-        
-        
          stage('deploy') {
             steps {
     
@@ -91,15 +80,6 @@ pipeline {
                 
             }
         }
-         
-         
-         
-         
-         
-         
-         
-         
-         
          
     }
 }
