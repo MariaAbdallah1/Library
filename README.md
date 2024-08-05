@@ -2,6 +2,7 @@
 ## Application Development
 ![WhatsApp Image 2024-08-05 at 17 27 43_0e3b4c75](https://github.com/user-attachments/assets/0eb253ff-e673-4ad9-b3e5-2b21ea26fa48)
 ## Infrastructure Terraform for AWS EKS
+This Terraform script automates the provisioning of an AWS EKS cluster along with the necessary infrastructure components. The setup includes the creation of a VPC, subnets, route tables, an internet gateway, a NAT gateway, security groups, and IAM roles and policies for both the EKS cluster and the node groups.
 ![eks drawio (1)](https://github.com/user-attachments/assets/ad58755c-9ebf-40d7-a245-dfb6f6fa716b)
 ```terraform
 resource "aws_vpc" "main" {
