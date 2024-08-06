@@ -1,85 +1,59 @@
 pipeline {
     agent any
+
     environment {
-        AWS_ACCESS_KEY_ID = credentials('AWS-ACCESS-KEY-ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS-KEY')
-        AWS_DEFAULT_REGION = 'eu-north-1'
-        
+        registry = "veles3/library"
+        registryCredential = 'dockerhub'
+        dockerImage = ''
+        kubeconfig = credentials('kubeconfig-credentials') // Jenkins credentials with your kubeconfig file
     }
-    stages{
-        stage('Checkout SCM'){
-            steps{
-                
-                git branch: 'main', url: 'https://github.com/MariaAbdallah1/Library.git'
+
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = "${registry}:${env.BUILD_NUMBER}"
+                    sh "docker build -t ${dockerImage} ."
+                }
             }
         }
-        
-          stage('Dockerbuild and push') {
+        stage('Push Docker Image') {
             steps {
-                script{
-                    withDockerRegistry(credentialsId: 'dockerhub') {
-                         bat 'docker build -t sarahassan11/myflask:latest .'
-                          bat 'docker push sarahassan11/myflask:latest'
+                script {
+                    withCredentials([usernamePassword(credentialsId: registryCredential, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                        sh "docker push ${dockerImage}"
+                        sh "docker tag ${dockerImage} ${registry}:latest"
+                        sh "docker push ${registry}:latest"
                     }
                 }
             }
-        }        
-        
-         stage('Initializing Terraform'){
-            steps{
-                 bat 'terraform init'
-            }
-             
-         }
-         
-         stage('Validating Terraform'){
-            steps{
-                 bat 'terraform validate'
-            }
-             
-         }
-         
-         
-          stage('Previewing the infrastructure'){
-            steps{
-                
-                bat 'terraform plan -out=tfplan'
-                
-            }
-             
-         }
-         
-          stage('Approval') {
-            steps {
-                input message: "Approve the Terraform plan?", ok: "Apply"
-            }
         }
-        
-         stage('Applying the infrastructure') {
-            steps {
-                bat 'terraform apply tfplan'
-            }
-        }
-        
-        stage('Update Kubeconfig') {
+        stage('Deploy to EKS') {
             steps {
                 script {
-                    // Ensure AWS CLI is installed and configured
-                    bat 'aws --version'
-                    
-                    // Update kubeconfig for EKS
-                    bat 'aws eks --region eu-north-1 update-kubeconfig --name my-cluster'
+                    withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
+                        // Update Kubernetes deployment with the new image
+                        sh """
+                        kubectl set image deployment/coredns coredns=${dockerImage} --namespace=kube-system --kubeconfig $KUBECONFIG
+                        """
+                    }
                 }
             }
         }
-        
-         stage('deploy') {
+        stage('Cleanup') {
             steps {
-    
-                kubernetesDeploy(configs: "app.yaml", kubeconfigId: "kubernetes")
-                
+                script {
+                    sh "docker rmi ${dockerImage}"
+                    sh "docker rmi ${registry}:latest"
+                }
             }
         }
-         
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
     }
 }
