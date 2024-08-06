@@ -78,8 +78,8 @@ kubectl apply -f app.yaml
 This CI/CD pipeline is to automate the process of building, pushing, and deploying Docker images for a continuous integration and continuous deployment workflow. This pipeline helps ensure that code changes are automatically tested and deployed to the production environment, reducing the risk of manual errors and speeding up the release process.
 
 ### Pipeline configuration (Environment Variables)
-**registry:** Docker Hub registry name.
-**registryCredential:** Jenkins credentials ID for Docker Hub.
+**registry:** Docker Hub registry name.__
+**registryCredential:** Jenkins credentials ID for Docker Hub.__
 **dockerImage:** Docker image name (dynamically set during the build stage).
 **kubeconfig:** Jenkins credentials ID for the Kubernetes configuration file.
 ```script
@@ -90,11 +90,11 @@ This CI/CD pipeline is to automate the process of building, pushing, and deployi
         kubeconfig = credentials('kubeconfig') // Jenkins credentials with your kubeconfig file
     }
 ```
-- Build Docker Image
-      - Purpose: To build a Docker image from the source code present in the repository.
-      - Steps:
-            1. Set the Docker image name with the build number.
-            2. Execute the Docker build command to create the image.
+### Build Docker Image
+- Purpose: To build a Docker image from the source code present in the repository.
+- Steps:
+    ..1. Set the Docker image name with the build number.
+    ..2. Execute the Docker build command to create the image.
   ```script
     stage('Build Docker Image') {
       steps {
