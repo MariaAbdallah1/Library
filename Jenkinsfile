@@ -33,6 +33,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
+                        sh "echo KUBECONFIG=$KUBECONFIG"
                         // Update Kubernetes deployment with the new image
                         sh """
                         kubectl set image deployment/coredns coredns=${dockerImage} --namespace=kube-system --kubeconfig $KUBECONFIG
