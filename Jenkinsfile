@@ -32,7 +32,7 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                         sh "echo KUBECONFIG=$KUBECONFIG"
                         // Update Kubernetes deployment with the new image
                         sh """
