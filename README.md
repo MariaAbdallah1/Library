@@ -74,75 +74,34 @@ spec:
 kubectl apply -f app.yaml
 ```
 ## CI/CD pipeline
-### Prerequisites
-- Jenkins installed and configured.
-- AWS CLI installed and configured.
-- Docker installed.
-- Terraform installed.
-- AWS access key and secret access key.
-- Docker Hub credentials.
-- Kubernetes cluster and kubeconfig file.
-Stages Overview
-1. Checkout SCM
-  - Purpose: Check out the source code from the specified Git repository.
-  - Steps:
-      ```git
-      git branch: 'main', url: 'https://github.com/MariaAbdallah1/Library.git'
-      ```
-2. Docker Build and Push
-  - Purpose: Build the Docker image and push it to Docker Hub.
-  - Steps:
-  ```script
-   script {
-        withDockerRegistry(credentialsId: 'dockerhub') {
-        bat 'docker build -t sarahassan11/myflask:latest .'
-        bat 'docker push sarahassan11/myflask:latest'
-        }
-  }
+### purpose
+This CI/CD pipeline is to automate the process of building, pushing, and deploying Docker images for a continuous integration and continuous deployment workflow. This pipeline helps ensure that code changes are automatically tested and deployed to the production environment, reducing the risk of manual errors and speeding up the release process.
+
+### Pipeline configuration (Environment Variables)
+**registry:** Docker Hub registry name.
+**registryCredential:** Jenkins credentials ID for Docker Hub.
+**dockerImage:** Docker image name (dynamically set during the build stage).
+**kubeconfig:** Jenkins credentials ID for the Kubernetes configuration file.
+```script
+  environment {
+        registry = "veles3/library"
+        registryCredential = 'dockerhub'
+        dockerImage = ''
+        kubeconfig = credentials('kubeconfig') // Jenkins credentials with your kubeconfig file
+    }
 ```
-4. Initialize Terraform
-  - Purpose: Initialize the Terraform configuration.
-  - Steps:
-    ```script
-    bat 'terraform init'
-    ```
-5. Validate Terraform
-  - Purpose: Validate the Terraform configuration.
-  - Steps:
-    ```script
-    bat 'terraform validate'
-    ```
-6. Terraform Plan
-  - Purpose: Create an execution plan for Terraform.
-  - Steps:
-    ```script
-    bat 'terraform plan -out=tfplan'
-    ```
-7. Approval
-  - Purpose: Wait for manual approval before applying the Terraform plan.
-  - Steps:
-    ```script
-    input message: "Approve the Terraform plan?", ok: "Apply"
-    ```
-8. Apply Terraform
-  - Purpose: Apply the Terraform plan to provision the infrastructure.
-  - Steps:
-    ```script
-    bat 'terraform apply tfplan'
-    ```
-9. Update Kubeconfig
-  - Purpose: Update the kubeconfig file to connect to the EKS cluster.
-  - Steps:
-    ```script
-    // Ensure AWS CLI is installed and configured
-    bat 'aws --version'
-                
-    // Update kubeconfig for EKS
-    bat 'aws eks --region eu-north-1 update-kubeconfig --name my-cluster'
-    ```
-10. Deploy to Kubernetes
-  - Purpose: Deploy the application to the Kubernetes cluster.
-  - Steps:
-    ```script
-    kubernetesDeploy(configs: "app.yaml", kubeconfigId: "kubernetes")
-    ```
+- Build Docker Image
+      - Purpose: To build a Docker image from the source code present in the repository.
+      - Steps:
+            1. Set the Docker image name with the build number.
+            2. Execute the Docker build command to create the image.
+  ```script
+    stage('Build Docker Image') {
+      steps {
+          script {
+              dockerImage = "${registry}:${env.BUILD_NUMBER}"
+              sh "docker build -t ${dockerImage} ."
+          }
+        }
+      }
+  ```
