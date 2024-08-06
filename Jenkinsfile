@@ -5,7 +5,7 @@ pipeline {
         registry = "veles3/library"
         registryCredential = 'dockerhub'
         dockerImage = ''
-        kubeconfig = credentials('kubeconfig-credentials') // Jenkins credentials with your kubeconfig file
+        kubeconfig = credentials('kubeconfig') // Jenkins credentials with your kubeconfig file
     }
 
     stages {
