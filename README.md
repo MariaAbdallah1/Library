@@ -91,8 +91,8 @@ This CI/CD pipeline is to automate the process of building, pushing, and deployi
     }
 ```
 ### Build Docker Image
-- Purpose: To build a Docker image from the source code present in the repository.
-- Steps:<br />
+- **Purpose:** To build a Docker image from the source code present in the repository.
+- **Steps:** <br />
     1. Set the Docker image name with the build number.
     2. Execute the Docker build command to create the image.
   ```script
@@ -105,3 +105,71 @@ This CI/CD pipeline is to automate the process of building, pushing, and deployi
         }
       }
   ```
+### Push Docker Image
+- **Purpose:** To push the built Docker image to Docker Hub.
+- **Steps:** <br />
+    1. Use Jenkins credentials to login to Docker Hub.
+    2. Push the built Docker image to Docker Hub.
+    3. Tag the Docker image as 'latest' and push the tag to Docker Hub.
+  ```script
+  stage('Push Docker Image') {
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: registryCredential, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                sh "docker push ${dockerImage}"
+                sh "docker tag ${dockerImage} ${registry}:latest"
+                sh "docker push ${registry}:latest"
+              }
+          }
+      }
+  }
+  ```
+### Deploy to EKS
+- **Purpose:** To deploy the Docker image to an EKS cluster.
+- **Steps:** <br />
+    1. Use Jenkins credentials to access the Kubernetes configuration file.
+    2. Update the Kubernetes deployment with the new Docker image.
+  ```script
+  stage('Deploy to EKS') {
+    steps {
+        script {
+            withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG'), [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                // Echo the KUBECONFIG path for debugging
+                sh "echo KUBECONFIG=$KUBECONFIG"
+                // Update Kubernetes deployment with the new image
+                sh """
+                kubectl set image deployment/coredns coredns=${dockerImage} --namespace=kube-system --kubeconfig $KUBECONFIG
+                """
+              }
+          }
+      }
+    }
+
+  ```
+### Cleanup
+- **Purpose:** To clean up the local Docker environment by removing the built images.
+- **Steps:** <br />
+    1. Remove the Docker image built during this pipeline run.
+    2. Remove the 'latest' tagged Docker image.
+  ```script
+  stage('Cleanup') {
+    steps {
+        script {
+            sh "docker rmi ${dockerImage}"
+            sh "docker rmi ${registry}:latest"
+        }
+      }
+  }
+  ```
+### Post Actions
+The post block ensures the workspace is cleaned up after the pipeline run, regardless of the outcome.
+```script
+post {
+    always {
+        script {
+            cleanWs()
+        }
+    }
+}
+```
