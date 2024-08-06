@@ -78,8 +78,8 @@ kubectl apply -f app.yaml
 This CI/CD pipeline is to automate the process of building, pushing, and deploying Docker images for a continuous integration and continuous deployment workflow. This pipeline helps ensure that code changes are automatically tested and deployed to the production environment, reducing the risk of manual errors and speeding up the release process.
 
 ### Pipeline configuration (Environment Variables)
-**registry:** Docker Hub registry name.__
-**registryCredential:** Jenkins credentials ID for Docker Hub.__
+**registry:** Docker Hub registry name. <br />
+**registryCredential:** Jenkins credentials ID for Docker Hub.<br />
 **dockerImage:** Docker image name (dynamically set during the build stage).
 **kubeconfig:** Jenkins credentials ID for the Kubernetes configuration file.
 ```script
