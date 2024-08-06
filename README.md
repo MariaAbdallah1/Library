@@ -80,8 +80,8 @@ This CI/CD pipeline is to automate the process of building, pushing, and deployi
 ### Pipeline configuration (Environment Variables)
 **registry:** Docker Hub registry name. <br />
 **registryCredential:** Jenkins credentials ID for Docker Hub.<br />
-**dockerImage:** Docker image name (dynamically set during the build stage).
-**kubeconfig:** Jenkins credentials ID for the Kubernetes configuration file.
+**dockerImage:** Docker image name (dynamically set during the build stage).<br />
+**kubeconfig:** Jenkins credentials ID for the Kubernetes configuration file.<br />
 ```script
   environment {
         registry = "veles3/library"
@@ -92,9 +92,9 @@ This CI/CD pipeline is to automate the process of building, pushing, and deployi
 ```
 ### Build Docker Image
 - Purpose: To build a Docker image from the source code present in the repository.
-- Steps:
-    ..1. Set the Docker image name with the build number.
-    ..2. Execute the Docker build command to create the image.
+- Steps:<br />
+    1. Set the Docker image name with the build number.
+    2. Execute the Docker build command to create the image.
   ```script
     stage('Build Docker Image') {
       steps {
